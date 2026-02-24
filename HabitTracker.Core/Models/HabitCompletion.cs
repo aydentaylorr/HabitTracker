@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace HabitTracker.Core.Models
+﻿namespace HabitTracker.Core.Models
 {
-    internal class HabitCompletion
+    public class HabitCompletion
     {
+        public Guid CompletionId { get; set; }
+        public Guid HabitId { get; set; }
+        public DateOnly CompletedDate { get; set; }
+        public Habit Habit { get; set; } = null!;
     }
 }
