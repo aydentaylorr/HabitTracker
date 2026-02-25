@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using HabitTracker.Core.Interfaces;
 using HabitTracker.Infrastructure.Repositories;
 using HabitTracker.Api.Helpers;
+using HabitTracker.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -31,6 +32,7 @@ builder.Services.AddCors(o =>
 // DEPENDENCY INJECTION
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IHabitRepository, HabitRepository>();
+builder.Services.AddScoped<HabitStatisticsService>();
 builder.Services.AddScoped<JwtHelper>();
 
 // ✅ JWT AUTHENTICATION

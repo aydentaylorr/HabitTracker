@@ -1,6 +1,7 @@
 ﻿using HabitTracker.Api.Helpers;
 using HabitTracker.Core.Interfaces;
 using HabitTracker.Core.Models;
+using HabitTracker.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,10 +13,14 @@ namespace HabitTracker.Api.Controllers;
 public class HabitsController : ControllerBase
 {
     private readonly IHabitRepository _repo;
+    private readonly HabitStatisticsService _stats;
 
-    public HabitsController(IHabitRepository repo)
+    public HabitsController(
+        IHabitRepository repo,
+        HabitStatisticsService stats)
     {
         _repo = repo;
+        _stats = stats;
     }
 
     private Guid CurrentUserId =>
@@ -40,7 +45,8 @@ public class HabitsController : ControllerBase
     [HttpPost("{id}/complete")]
     public async Task<IActionResult> Complete(Guid id)
     {
-        await _repo.CompleteHabit(id,
+        await _repo.CompleteHabit(
+            id,
             DateOnly.FromDateTime(DateTime.Today));
 
         return Ok();
@@ -51,5 +57,13 @@ public class HabitsController : ControllerBase
     {
         await _repo.DeleteHabit(id, CurrentUserId);
         return NoContent();
+    }
+
+    // ⭐ NEW ENDPOINT
+    [HttpGet("{id}/stats")]
+    public async Task<IActionResult> GetStats(Guid id)
+    {
+        var stats = await _stats.GetStats(id, CurrentUserId);
+        return Ok(stats);
     }
 }
