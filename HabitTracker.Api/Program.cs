@@ -30,6 +30,7 @@ builder.Services.AddCors(o =>
 
 // DEPENDENCY INJECTION
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IHabitRepository, HabitRepository>();
 builder.Services.AddScoped<JwtHelper>();
 
 // ✅ JWT AUTHENTICATION

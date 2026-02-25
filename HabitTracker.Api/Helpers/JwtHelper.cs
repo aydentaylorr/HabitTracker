@@ -37,5 +37,15 @@ namespace HabitTracker.Api.Helpers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public static Guid GetUserId(ClaimsPrincipal user)
+        {
+            var id = user.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (id == null)
+                throw new Exception("User ID claim missing from token");
+
+            return Guid.Parse(id);
+        }
     }
 }
