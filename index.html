@@ -1,0 +1,1114 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HabitTracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg: #f0ede8;
+    --surface: #e8e4de;
+    --surface2: #dedad3;
+    --white: #faf9f7;
+    --green-dark: #1e4d3a;
+    --green-mid: #2d6b50;
+    --green-btn: #3d7a5e;
+    --green-muted: #8aaa96;
+    --text-primary: #1a2e24;
+    --text-secondary: #5a7060;
+    --text-muted: #8a9e90;
+    --border: #d4cfc8;
+    --orange: #e87c3e;
+    --red: #c0392b;
+    --red-light: #fde8e8;
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+}
+
+.screen {
+    display: none;
+    min-height: 100vh;
+}
+
+    .screen.active {
+        display: flex;
+        flex-direction: column;
+    }
+
+/* ── AUTH ── */
+#authScreen {
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.auth-card {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 40px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+
+.auth-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 32px;
+}
+
+.auth-logo-icon {
+    width: 42px;
+    height: 42px;
+    background: var(--green-dark);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+}
+
+.auth-logo-name {
+    font-family: 'Lora', serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.auth-tabs {
+    display: flex;
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 28px;
+    gap: 4px;
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 9px;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+    .auth-tab.active {
+        background: var(--white);
+        color: var(--text-primary);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+
+.auth-form {
+    display: none;
+    flex-direction: column;
+    gap: 14px;
+}
+
+    .auth-form.active {
+        display: flex;
+    }
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 0.02em;
+}
+
+.form-input {
+    padding: 13px 15px;
+    border: 1.5px solid var(--border);
+    border-radius: 11px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.93rem;
+    background: var(--white);
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+    .form-input:focus {
+        border-color: var(--green-dark);
+    }
+
+.form-error {
+    font-size: 0.78rem;
+    color: var(--red);
+    min-height: 16px;
+}
+
+.auth-error-banner {
+    background: var(--red-light);
+    color: var(--red);
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: none;
+    margin-bottom: 4px;
+}
+
+    .auth-error-banner.visible {
+        display: block;
+    }
+
+.btn-primary {
+    padding: 14px;
+    background: var(--green-dark);
+    color: #fff;
+    border: none;
+    border-radius: 11px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.2s;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+    .btn-primary:hover {
+        background: var(--green-mid);
+    }
+
+    .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+.auth-footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* ── NAV ── */
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 32px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Lora', serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+.logo-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--green-dark);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-username {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.btn-nav {
+    padding: 9px 18px;
+    border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.btn-new-habit {
+    background: var(--green-dark);
+    color: #fff;
+}
+
+    .btn-new-habit:hover {
+        background: var(--green-mid);
+    }
+
+.btn-logout {
+    background: var(--surface);
+    color: var(--text-secondary);
+}
+
+    .btn-logout:hover {
+        background: var(--surface2);
+    }
+
+/* ── MAIN ── */
+main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px;
+}
+
+.date-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.greeting {
+    font-family: 'Lora', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    margin-bottom: 32px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 12px;
+    margin-bottom: 36px;
+}
+
+.stat-card {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 18px 20px;
+    box-shadow: var(--card-shadow);
+}
+
+.stat-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.stat-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-family: 'Lora', serif;
+    font-size: 1.75rem;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.stat-sub {
+    font-size: 0.77rem;
+    color: var(--text-muted);
+}
+
+.section-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 14px;
+}
+
+.empty-state {
+    background: var(--white);
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    padding: 60px 24px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.empty-icon {
+    font-size: 2.5rem;
+}
+
+.empty-title {
+    font-family: 'Lora', serif;
+    font-size: 1.1rem;
+}
+
+.empty-sub {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.habits-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.habit-item {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 15px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+    .habit-item:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+.habit-emoji-wrap {
+    width: 44px;
+    height: 44px;
+    background: var(--surface);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    transition: background 0.2s;
+}
+
+.habit-item.completed .habit-emoji-wrap {
+    background: #d4ead9;
+}
+
+.habit-name {
+    font-weight: 500;
+    font-size: 0.95rem;
+    flex: 1;
+}
+
+.habit-item.completed .habit-name {
+    text-decoration: line-through;
+    color: var(--text-muted);
+}
+
+.week-dots {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--surface2);
+    transition: background 0.2s;
+}
+
+    .dot.filled {
+        background: var(--green-dark);
+    }
+
+    .dot.today-empty {
+        background: var(--border);
+        border: 2px solid #b0b8b0;
+    }
+
+.habit-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.habit-action-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+}
+
+    .habit-action-btn:hover {
+        background: var(--surface);
+        color: var(--text-primary);
+    }
+
+    .habit-action-btn.danger:hover {
+        background: var(--red-light);
+        color: var(--red);
+    }
+
+.complete-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    color: var(--green-dark);
+    font-size: 0.9rem;
+}
+
+    .complete-btn:hover {
+        border-color: var(--green-dark);
+        background: #d4ead9;
+    }
+
+    .complete-btn.done {
+        background: var(--green-dark);
+        border-color: var(--green-dark);
+        color: #fff;
+    }
+
+/* CHART */
+.chart-section {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: 24px;
+    box-shadow: var(--card-shadow);
+    display: none;
+}
+
+    .chart-section.visible {
+        display: block;
+    }
+
+.chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.chart-title {
+    font-family: 'Lora', serif;
+    font-size: 1.15rem;
+    font-weight: 400;
+}
+
+.chart-habit-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 16px;
+    background: var(--surface);
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+/* MODAL */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20,35,28,0.55);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+
+    .modal-overlay.open {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+.modal {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 32px;
+    width: 540px;
+    max-width: 95vw;
+    transform: translateY(12px);
+    transition: transform 0.25s;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+
+.modal-overlay.open .modal {
+    transform: translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+}
+
+.modal-title {
+    font-family: 'Lora', serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.modal-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--text-secondary);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .modal-close:hover {
+        background: var(--surface2);
+    }
+
+.icon-grid {
+    display: grid;
+    grid-template-columns: repeat(6,1fr);
+    gap: 8px;
+    margin-bottom: 22px;
+}
+
+.icon-option {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    border: 2px solid transparent;
+    background: var(--surface);
+    font-size: 1.35rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+}
+
+    .icon-option:hover {
+        background: var(--surface2);
+    }
+
+    .icon-option.selected {
+        border-color: var(--green-dark);
+        background: #d4ead9;
+    }
+
+.habit-form-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    background: var(--white);
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 18px;
+}
+
+    .habit-form-input:focus {
+        border-color: var(--green-dark);
+    }
+
+.btn-add {
+    width: 100%;
+    padding: 14px;
+    background: var(--green-btn);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+    .btn-add:hover {
+        background: var(--green-dark);
+    }
+
+    .btn-add:disabled {
+        background: var(--green-muted);
+        cursor: not-allowed;
+    }
+
+.spinner {
+    width: 17px;
+    height: 17px;
+    border: 2px solid rgba(255,255,255,0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media(max-width:640px) {
+    .stats-grid {
+        grid-template-columns: repeat(2,1fr);
+    }
+
+    nav {
+        padding: 12px 16px;
+    }
+
+    main {
+        padding: 24px 16px;
+    }
+
+    .greeting {
+        font-size: 1.5rem;
+    }
+
+    .auth-card {
+        padding: 28px 22px;
+    }
+
+    .icon-grid {
+        grid-template-columns: repeat(5,1fr);
+    }
+
+    .week-dots {
+        display: none;
+    }
+
+    .nav-username {
+        display: none;
+    }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════
+    AUTH SCREEN
+════════════════════════════ -->
+<div id="authScreen" class="screen active">
+<div class="auth-card">
+    <div class="auth-logo">
+        <div class="auth-logo-icon">🌿</div>
+        <span class="auth-logo-name">HabitTracker</span>
+    </div>
+
+    <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchTab('login')">Sign In</button>
+        <button class="auth-tab" onclick="switchTab('register')">Create Account</button>
+    </div>
+
+    <div class="auth-error-banner" id="authError"></div>
+
+    <!-- LOGIN -->
+    <form class="auth-form active" id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-input" id="loginEmail" type="email" placeholder="you@example.com" required />
+        </div>
+        <div class="form-group">
+            <label class="form-label">Password</label>
+            <input class="form-input" id="loginPassword" type="password" placeholder="Your password" required />
+        </div>
+        <button class="btn-primary" type="submit" id="loginBtn">Sign In</button>
+    </form>
+
+    <!-- REGISTER -->
+    <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
+        <div class="form-group">
+            <label class="form-label">Username</label>
+            <input class="form-input" id="regUsername" type="text" placeholder="e.g. JohnDoe" required />
+        </div>
+        <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-input" id="regEmail" type="email" placeholder="you@example.com" required />
+        </div>
+        <div class="form-group">
+            <label class="form-label">Password</label>
+            <input class="form-input" id="regPassword" type="password" placeholder="Min. 6 characters" required />
+        </div>
+        <div class="form-group">
+            <label class="form-label">Confirm Password</label>
+            <input class="form-input" id="regConfirm" type="password" placeholder="Repeat password" required />
+            <span class="form-error" id="confirmError"></span>
+        </div>
+        <button class="btn-primary" type="submit" id="registerBtn">Create Account</button>
+    </form>
+
+    <p class="auth-footer" id="authFooter">
+        Don't have an account?
+        <a href="#" onclick="switchTab('register');return false;"
+            style="color:var(--green-dark);font-weight:600;">Sign up free</a>
+    </p>
+</div>
+</div>
+
+<!-- ════════════════════════════
+    APP SCREEN
+════════════════════════════ -->
+<div id="appScreen" class="screen">
+<nav>
+    <div class="nav-logo">
+        <div class="logo-icon">🌿</div>
+        HabitTracker
+    </div>
+    <div class="nav-right">
+        <span class="nav-username" id="navUsername"></span>
+        <button class="btn-nav btn-new-habit" onclick="openModal()">+ New Habit</button>
+        <button class="btn-nav btn-logout" onclick="logout()">Sign out</button>
+    </div>
+</nav>
+
+<main>
+    <p class="date-label" id="dateLabel"></p>
+    <h1 class="greeting" id="greeting">Start building habits</h1>
+
+    <div class="stats-grid" id="statsGrid" style="display:none;">
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <span class="stat-label">Today</span>
+                <span style="color:var(--green-dark);font-size:1rem;">✓</span>
+            </div>
+            <div class="stat-value" id="statToday">0/0</div>
+            <div class="stat-sub" id="statTodayPct">0%</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <span class="stat-label">Best Streak</span>
+                <span style="font-size:1rem;">🔥</span>
+            </div>
+            <div class="stat-value" id="statStreak">0d</div>
+            <div class="stat-sub">current</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <span class="stat-label">30D Average</span>
+                <span style="color:#4aaa6e;font-size:1rem;">↗</span>
+            </div>
+            <div class="stat-value" id="statAvg">0%</div>
+            <div class="stat-sub">completion</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <span class="stat-label">Total Habits</span>
+                <span style="color:var(--orange);font-size:1rem;">◎</span>
+            </div>
+            <div class="stat-value" id="statCount">0</div>
+            <div class="stat-sub">active</div>
+        </div>
+    </div>
+
+    <p class="section-title">Today's Habits</p>
+    <div id="habitList"></div>
+
+    <div class="chart-section" id="chartSection">
+        <div class="chart-header">
+            <span class="chart-title">Weekly Progress</span>
+            <button class="modal-close" onclick="closeChart()">✕</button>
+        </div>
+        <div class="chart-habit-row" id="chartHabitRow"></div>
+        <canvas id="progressChart" height="120"></canvas>
+    </div>
+</main>
+</div>
+
+<!-- New Habit Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+<div class="modal">
+    <div class="modal-header">
+        <span class="modal-title">Create a New Habit</span>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <label class="form-label" style="display:block;margin-bottom:10px;">Choose an icon</label>
+    <div class="icon-grid" id="iconGrid"></div>
+    <label class="form-label" style="display:block;margin-bottom:8px;">Habit name</label>
+    <input class="habit-form-input" id="habitNameInput" type="text"
+            placeholder="e.g. Drink 8 glasses of water"
+            oninput="updateAddBtn()"
+            onkeydown="if(event.key==='Enter') addHabit()" />
+    <button class="btn-add" id="addBtn" onclick="addHabit()" disabled>Add Habit</button>
+</div>
+</div>
+
+<script>
+    // ════════════════════════════════════════════════════
+    // CONFIG
+    // ════════════════════════════════════════════════════
+    const API = "https://localhost:7001/api";
+
+    const ICONS = ['💪', '📚', '🏃', '💧', '🧘', '🛁', '🎵', '💤', '🥗', '🧹', '💊', '🌿'];
+
+    let habits = [];
+    let selectedIcon = ICONS[0];
+    let activeChartHabitId = null;
+    let progressChart = null;
+    let currentUser = null;
+
+
+    // ════════════════════════════════════════════════════
+    // AUTH HELPERS
+    // ════════════════════════════════════════════════════
+    function saveAuth(data) {
+        localStorage.setItem("ht_token", data.token);
+        localStorage.setItem("ht_userId", data.userId);
+        localStorage.setItem("ht_username", data.username);
+
+        currentUser = data;
+    }
+
+    function authHeaders() {
+        return {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("ht_token")}`
+        };
+    }
+
+    async function apiFetch(path, options = {}) {
+        const res = await fetch(`${API}${path}`, {
+            ...options,
+            headers: { ...authHeaders(), ...(options.headers || {}) }
+        });
+
+        if (res.status === 401) {
+            logout();
+            return null;
+        }
+
+        return res;
+    }
+
+
+    // ════════════════════════════════════════════════════
+    // INIT
+    // ════════════════════════════════════════════════════
+    function init() {
+
+        document.getElementById("dateLabel").textContent =
+            new Date().toLocaleDateString("en-US", {
+                weekday: "long", month: "long", day: "numeric"
+            });
+
+        const token = localStorage.getItem("ht_token");
+
+        if (token) {
+            currentUser = {
+                token,
+                userId: localStorage.getItem("ht_userId"),
+                username: localStorage.getItem("ht_username")
+            };
+
+            showApp();
+            loadHabits();
+        } else {
+            showAuth();
+        }
+
+        renderIconGrid();
+    }
+
+
+    // ════════════════════════════════════════════════════
+    // SCREEN SWITCHING
+    // ════════════════════════════════════════════════════
+    function showAuth() {
+        document.getElementById("authScreen").classList.add("active");
+        document.getElementById("appScreen").classList.remove("active");
+    }
+
+    function showApp() {
+        document.getElementById("authScreen").classList.remove("active");
+        document.getElementById("appScreen").classList.add("active");
+
+        document.getElementById("navUsername").textContent =
+            currentUser?.username || "";
+
+    }
+
+
+    // ════════════════════════════════════════════════════
+    // LOGIN
+    // ════════════════════════════════════════════════════
+    async function handleLogin(e) {
+        e.preventDefault();
+
+        const email =
+            document.getElementById("loginEmail").value;
+
+        const password =
+            document.getElementById("loginPassword").value;
+
+        await login(emailm password);
+    }
+
+
+    // ════════════════════════════════════════════════════
+    // REGISTER
+    // ════════════════════════════════════════════════════
+    async function handleRegister(e) {
+        e.preventDefault();
+
+        const password =
+            document.getElementById("regPassword").value;
+
+        const confirm =
+            document.getElementById("regConfirm").value;
+
+        if (password !== confirm) return;
+
+        const res = await fetch(`${API}/auth/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                username: document.getElementById("regUsername").value,
+                email: document.getElementById("regEmail").value,
+                password
+            })
+        });
+
+        const data = await res.json();
+
+        saveAuth(data);
+
+        showApp();
+        loadHabits();
+    }
+
+
+    // ════════════════════════════════════════════════════
+    // LOGOUT
+    // ════════════════════════════════════════════════════
+    function logout() {
+        localStorage.removeItem("ht_token");
+        localStorage.removeItem("ht_userId");
+        localStorage.removeItem("ht_username");
+
+        currentUser = null;
+        habits = [];
+
+        showAuth();
+    }
+
+
+    // ════════════════════════════════════════════════════
+    // LOAD HABITS (REAL API)
+    // ════════════════════════════════════════════════════
+    async function loadHabits() {
+
+        const res = await apiFetch("/habits");
+        if (!res) return;
+
+        habits = await res.json();
+        render();
+    }
+
+
+    // ════════════════════════════════════════════════════
+    // ADD HABIT
+    // ════════════════════════════════════════════════════
+    async function addHabit() {
+
+        const name =
+            document.getElementById("habitNameInput").value.trim();
+
+        if (!name) return;
+
+        await apiFetch("/habits", {
+            method: "POST",
+            body: JSON.stringify({
+                name,
+                icon: selectedIcon
+            })
+        });
+
+        loadHabits();
+        closeModal();
+    }
+
+
+    // ════════════════════════════════════════════════════
+    // COMPLETE HABIT
+    // ════════════════════════════════════════════════════
+    async function toggleComplete(id) {
+
+        await apiFetch(`/habits/${id}/complete`, {
+            method: "POST"
+        });
+
+        loadHabits();
+    }
+
+
+    // ════════════════════════════════════════════════════
+    // DELETE HABIT
+    // ════════════════════════════════════════════════════
+    async function deleteHabit(id) {
+
+        await apiFetch(`/habits/${id}`, {
+            method: "DELETE"
+        });
+
+        loadHabits();
+    }
+
+    init();
+</script>
+</body>
+</html>
