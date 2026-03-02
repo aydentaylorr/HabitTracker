@@ -25,8 +25,13 @@ public class HabitRepository : IHabitRepository
 
     public async Task<Habit> AddHabit(Habit habit)
     {
+        habit.User = null!;
+
         _db.Habits.Add(habit);
         await _db.SaveChangesAsync();
+
+        _db.Entry(habit).State = EntityState.Detached; // detach to prevent tracking issues
+
         return habit;
     }
 

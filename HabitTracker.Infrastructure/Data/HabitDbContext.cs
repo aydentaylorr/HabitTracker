@@ -38,6 +38,17 @@ public class HabitDbContext : DbContext
             e.Property(h => h.CreatedAt).HasColumnName("created_at");
             e.Property(h => h.IsDeleted).HasColumnName("is_deleted");
             e.HasQueryFilter(h => !h.IsDeleted);
+
+            // Tell EF how the relationships work
+            e.HasOne(h => h.User)
+             .WithMany(u => u.Habits)
+             .HasForeignKey(h => h.UserId)
+             .OnDelete(DeleteBehavior.Cascade);
+
+            e.HasMany(h => h.Completions)
+             .WithOne(c => c.Habit)
+             .HasForeignKey(c => c.HabitId)
+             .OnDelete(DeleteBehavior.Cascade);
         });
 
         // ── HABIT COMPLETIONS
